@@ -1,0 +1,38 @@
+{
+    "name": "{{.cluster.name}}",
+    "description": "{{.cluster.description}}",
+    "subnet": "{{.cluster.subnet}}",
+    "nodes": [
+        {
+            "role": "Mysql",
+            "container": {
+                "type": "docker",
+                "image": "chilianyi/mysql"
+            },
+            "count": 1,
+            "cpu": "{{.cluster.Mysql.cpu}}",
+            "memory": "{{.cluster.Mysql.memory}}",
+            "services": {
+                "start": {
+                    "cmd": "MYSQL_ROOT_PASSWORD=wordpress MYSQL_ROOT_HOST=% docker-entrypoint.sh mysqld & sleep 10"
+                }
+            }
+        },
+        {
+            "role": "Wordpress",
+            "container": {
+                "type": "docker",
+                "image": "chilianyi/wordpress"
+            },
+            "count": 1,
+            "cpu": "{{.cluster.Wordpress.cpu}}",
+            "memory": "{{.cluster.Wordpress.memory}}",
+            "services": {
+                "start": {
+                    "order": 1,
+                    "cmd": "WORDPRESS_DB_PASSWORD=wordpress WORDPRESS_DB_HOST=`cat /opt/openpitrix/conf/mysql_hostname` docker-entrypoint.sh apache2-foreground & sleep 10"
+                }
+            }
+        }
+    ]
+}
